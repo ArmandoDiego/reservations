@@ -1,5 +1,8 @@
 package com.diego.reservations.busines.service;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +22,8 @@ import com.diego.reservations.data.repository.RoomRepository;
 
 @Service
 public class ReservationService {
+	
+	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private RoomRepository roomRepository;
     private GuestRepository guestRepository;
     private ReservationRepository reservationRepository;
@@ -30,7 +35,8 @@ public class ReservationService {
         this.reservationRepository = reservationRepository;
     }
 
-    public List<RoomReservation> getRoomReservationsForDate(Date date){
+    public List<RoomReservation> getRoomReservationsForDate(String dateString){
+    	Date date= createDateFromDateString(dateString);
         Iterable<Room> rooms = this.roomRepository.findAll();
         Map<Long, RoomReservation> roomReservationMap = new HashMap<>();
         rooms.forEach(room->{
@@ -58,5 +64,19 @@ public class ReservationService {
             roomReservations.add(roomReservationMap.get(roomId));
         }
         return roomReservations;
+    }
+    
+    private Date createDateFromDateString(String dateString) {
+    	Date date= null;
+		if(null!=dateString) {
+				try {
+					date = DATE_FORMAT.parse(dateString);
+				} catch (ParseException e) {
+					date =new Date();
+				}
+		}else {
+			date=new Date();
+		}
+		return date;
     }
 }
